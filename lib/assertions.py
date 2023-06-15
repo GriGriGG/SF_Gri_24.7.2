@@ -6,6 +6,11 @@ import os
 
 class Assertions:
 
+    """Готовые наборы команд для ускорения написания тестов:
+    проверка статус кода,
+    нахождение в ответе ключевых слов,
+    запись строк в файл .env"""
+
     @staticmethod
     def assert_json_has_key(response: Response, key):
         '''Утверждение: JSON-ответ содержит указанный ключ'''
@@ -17,10 +22,10 @@ class Assertions:
         assert key in response_as_dict, f"JSON ответ не содержит ключ '{key}'"
 
     @staticmethod
-    def assert_code_status(response: Response, expected_status_code):
+    def assert_code_status(status: int, expected_status_code):
         '''Утверждение: статус код ответа соответствует ожидаемому'''
-        assert response.status_code == expected_status_code, \
-            f"Непредсказуемый статус код! Ожидаемый: {expected_status_code}. Полученный: {response.status_code}"
+        assert status == expected_status_code, \
+            f"Непредсказуемый статус код! Ожидаемый: {expected_status_code}. Полученный: {status}"
 
     @staticmethod
     def assert_json_has_not_key(response: Response, name):
@@ -53,3 +58,15 @@ class Assertions:
         with open('../.env', 'w') as f:
             config.write(f)
         os.environ['name'] = new_value
+
+    @staticmethod
+    def assert_write_auth_key(new_value):
+        config = configparser.ConfigParser()
+        config.read('../.env')
+        if 'DEFAULT' not in config:
+            config['DEFAULT'] = {}
+        config.set('DEFAULT', 'auth_key', new_value)
+        with open('../.env', 'w') as f:
+            config.write(f)
+        os.environ['auth_key'] = new_value
+

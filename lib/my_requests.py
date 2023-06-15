@@ -1,6 +1,7 @@
 import requests
 from lib.logger import Logger
 
+
 class MyRequests():
 
     '''Класс-обертка для выполнения HTTP-запросов'''
@@ -21,7 +22,6 @@ class MyRequests():
     def delete(url: str, data: dict = None, headers: dict = None):
         return MyRequests._send(url, data, headers, 'DELETE')
 
-
     @staticmethod
     def _send(url: str, data: dict, headers: dict, method: str):
 
@@ -29,9 +29,11 @@ class MyRequests():
 
         if headers is None:
             headers = {}
+        if data is None:
+            data = {}
+
 
         Logger.add_request(url, data, headers, method)
-
 
         if method == 'GET':
             response = requests.get(url, headers=headers, data=data)

@@ -4,7 +4,12 @@ from lib.my_requests import MyRequests
 from lib.assertions import Assertions
 from datetime import datetime
 from dotenv import load_dotenv
+from io import open
 load_dotenv()
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+
 
 class TestPetFriends(BaseCase):
     def setup(self):
@@ -14,7 +19,7 @@ class TestPetFriends(BaseCase):
         }
         response = MyRequests.get('/api/key', headers=headers)
 
-        #получение auth_key
+        # получение auth_key
         req_json = response.json()
         assert "key" in req_json
         self.auth_key = req_json['key']
@@ -22,11 +27,10 @@ class TestPetFriends(BaseCase):
         Assertions.assert_code_status(response, 200)
         Assertions.assert_json_has_key(response, 'key')
 
-        print(self.auth_key)
 
         random_part = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 
-        self.name_pet = f"Casper{random_part}"
+        self.name_pet = f"Kit{random_part}"
         self.animal_type_pet = "Cat"
         self.age_pet = "1"
 
@@ -80,8 +84,39 @@ class TestPetFriends(BaseCase):
 
         Assertions.assert_code_status(response, 200)
 
-    def test_delete_last_pet(self):
-        # DELETE_PETS
+    def test_add_photo(self, pet_photo='img/kit.jpg'):
+        # ADD_PHOTO_OF_PET
+        # data = {
+        #     'pet_photo': (pet_photo, open(pet_photo, 'rb'), 'image/jpeg')
+        # }
+
+        data = MultipartEncoder(
+            fields={
+                'pet_photo': (pet_photo, open(pet_photo, 'rb'), 'image/jpeg')
+            })
+        headers = {
+            'auth_key': self.auth_key,
+            'Content-Type': data.content_type
+        }
+
+        url = f'https://petfriends.skillfactory.ru/api/pets/set_photo/{self.new_pet_id}'
+        response = MyRequests.post(url, headers=headers, data=data)
+        # response = MyRequests.post(f'/api/pets/set_photo/{self.new_pet_id}', headers=headers, data=data)
+        Assertions.assert_json_has_key(response, 'age')
+        Assertions.assert_code_status(response, 200)
+
+        # status = response.status_code
+        # try:
+        #     result = response.json()
+        # except json.decoder.JSONDecodeError:
+        #     result = response.text
+        # print(result)
+        # return status, result
+
+
+
+    def test_emoving_all_values_via_an_empty_query(self):
+        # _PETS
         headers = {
             'auth_key': self.auth_key,
         }
@@ -89,3 +124,21 @@ class TestPetFriends(BaseCase):
         response = MyRequests.put(f'/api/pets/{self.new_pet_id}', headers=headers)
 
         Assertions.assert_code_status(response, 200)
+
+    def test_delete_last_pet(self):
+        # DELETE_PETS
+        headers = {
+            'auth_key': self.auth_key,
+        }
+
+        response = MyRequests.delete(f'/api/pets/{self.new_pet_id}', headers=headers)
+
+        Assertions.assert_code_status(response, 200)
+
+        # status = response.status_code
+        # try:
+        #     result = response.json()
+        # except json.decoder.JSONDecodeError:
+        #     result = response.text
+        # print(result)
+        # return status, result

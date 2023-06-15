@@ -5,15 +5,16 @@ from datetime import datetime
 class BaseCase:
     '''Базовый класс для тестовых случаев'''
 
-    def get_json_value(self, response: Response, key):
+    def get_json_value(self, response: Response, name):
         '''Метод для получения значения из JSON-ответа по ключу'''
         try:
             response_as_dict = response.json()
         except json.decoder.JSONDecodeError:
             assert False, f"Пришёл ответ не в формате JSON. Текст ответа {response.text}"
 
-        assert key in response_as_dict, f"JSON ответ не содержит ключ {key}"
-        return response_as_dict[key]
+        assert name in response_as_dict, f"JSON ответ не содержит ключ {name}"
+        return response_as_dict[name]
+
 
     def get_key (self, response: Response, key):
         '''Метод для получения всего JSON-ответа'''
