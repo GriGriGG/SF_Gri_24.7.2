@@ -4,7 +4,9 @@ import json
 
 from requests import Response
 
+
 class Logger:
+    """Создание лога в удобной для чтения форме"""
     log_dir = os.path.abspath("../logs")
     file_name = os.path.join(log_dir, f"log_{datetime.datetime.now().strftime('%m-%d-%Y-%H-%M-%S')}.log")
 
@@ -20,7 +22,7 @@ class Logger:
         return response_text.encode().decode('unicode-escape')
 
     @classmethod
-    def add_request(cls, url:str, data: dict, headers: dict, method: str):
+    def add_request(cls, url: str, data: dict, headers: dict, method: str):
         testname = os.environ.get('PYTEST_CURRENT_TEST')
 
         data_to_add = f'\n--REQUESTS--\n'
